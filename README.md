@@ -1,1 +1,5 @@
-# tdd-django
+tdd-django
+===
+
+Test Driven DJango Design
+
