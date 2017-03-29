@@ -1,5 +1,5 @@
 tdd-django
 ===
 
-Test Driven DJango Design
+Test Driven Development with DJango
 
