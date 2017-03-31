@@ -1,5 +1,8 @@
+from time import sleep
 from selenium import webdriver
 from django.test import LiveServerTestCase
+
+from solos.models import Solo
 
 
 class StudentTestCase(LiveServerTestCase):
@@ -8,6 +11,21 @@ class StudentTestCase(LiveServerTestCase):
         self.browser = webdriver.Chrome()
         # self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(2)
+        self.solo1 = Solo.objects.create(
+            instrument='saxophone',
+            artist='John Coltrane',
+            track='My Favorite Things'
+        )
+        self.solo2 = Solo.objects.create(
+            instrument='saxophone',
+            artist='Cannonball Adderley',
+            track='All Blues'
+        )
+        self.solo3 = Solo.objects.create(
+            instrument='saxophone',
+            artist='Cannonball Adderley',
+            track='Waltz for Debby'
+        )
 
     def tearDown(self):
         self.browser.quit()
@@ -62,6 +80,7 @@ class StudentTestCase(LiveServerTestCase):
         second_artist_input.send_keys('Cannonball Adderley')
         self.browser.find_element_by_css_selector('form button').click()
         second_search_results = self.browser.find_elements_by_css_selector('.jmad-search-result')
+        sleep(60)
         self.assertEqual(len(second_search_results), 2)
 
         # He clicks on a search result.
@@ -72,6 +91,5 @@ class StudentTestCase(LiveServerTestCase):
         # He also sees the start time and end time of the
         # solo.
 
-        from time import sleep
-        sleep(2)
+        sleep(5)
         self.fail('Incmplete Test')
