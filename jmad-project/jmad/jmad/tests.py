@@ -1,4 +1,3 @@
-from time import sleep
 from selenium import webdriver
 from django.test import LiveServerTestCase
 
@@ -7,11 +6,10 @@ class StudentTestCase(LiveServerTestCase):
 
     def setUp(self):
         self.browser = webdriver.Chrome()
+        # self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(2)
 
     def tearDown(self):
-        print('Sleeping for 5 seconds')
-        sleep(5)
         self.browser.quit()
 
     def test_student_find_solos(self):
