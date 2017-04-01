@@ -7,7 +7,7 @@ from albums.models import Track
 
 from solos.models import Solo
 from solos.views import index
-from solos.views import SoloDetailView
+from solos.views import solo_detail
 
 
 class _SolosBaseTestCase(TestCase):
@@ -87,17 +87,15 @@ class SoloViewTestCase(_SolosBaseTestCase):
         Test that the solo view returns a 200 response, uses
         the correct template, and has the correct context
         """
-        request = self.factory.get('/solos/1/')
+        request = self.factory.get('/solos/no-funny-hats/bugle-call-rag/buddy-rich/')
 
-        response = SoloDetailView.as_view()(
-            request,
-            pk=self.drum_solo.pk
-        )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.context_data['solo'].artist,
-            'Rich'
-        )
         with self.assertTemplateUsed('solos/solo_detail.html'):
-            response.render()
+            response = solo_detail(request,
+                                   album=self.no_funny_hats.slug,
+                                   track=self.bugle_call_rag.slug,
+                                   artist=self.drum_solo.slug
+                                   )
+        self.assertEqual(response.status_code, 200)
+        page = response.content.decode()
+        self.assertInHTML('<p id="jmad-artist">Rich</p>', page)
+        self.assertInHTML('<p id="jmad-track">Bugle Call Rag [1 solo]</p>', page)

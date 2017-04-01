@@ -23,7 +23,7 @@ class SolosURLsTestCase(TestCase):
 
         self.assertEqual(
             solo_detail.func.__name__,
-            'SoloDetailView'
+            'solo_detail'
         )
         self.assertEqual(
             solo_detail.kwargs['album'],
