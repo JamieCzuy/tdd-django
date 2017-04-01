@@ -1,4 +1,3 @@
-from time import sleep
 from selenium import webdriver
 from django.test import LiveServerTestCase
 
@@ -14,17 +13,22 @@ class StudentTestCase(LiveServerTestCase):
         self.solo1 = Solo.objects.create(
             instrument='saxophone',
             artist='John Coltrane',
-            track='My Favorite Things'
+            track='My Favorite Things',
+            album='My Favorite Things'
         )
         self.solo2 = Solo.objects.create(
             instrument='saxophone',
             artist='Cannonball Adderley',
-            track='All Blues'
+            track='All Blues',
+            album='Kind of Blue',
+            start_time='2:06',
+            end_time='4:01'
         )
         self.solo3 = Solo.objects.create(
             instrument='saxophone',
             artist='Cannonball Adderley',
-            track='Waltz for Debby'
+            track='Waltz for Debby',
+            album='Know What I Mean?'
         )
 
     def tearDown(self):
@@ -119,6 +123,3 @@ class StudentTestCase(LiveServerTestCase):
             self.browser.find_element_by_css_selector('#jmad-end-time').text,
             '4:01'
         )
-
-        sleep(5)
-        self.fail('Incmplete Test')
