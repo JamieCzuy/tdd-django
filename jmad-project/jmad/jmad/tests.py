@@ -168,3 +168,17 @@ class StudentTestCase(LiveServerTestCase):
             self.browser.find_element_by_css_selector('#jmad-album').text,
             'Kind of Blue [3 tracks]'
         )
+
+    def test_02_staff_can_add_content(self):
+        """
+        Tests that a 'staff' user can access the admin and
+        add Albums, Tracks, and Solos
+        """
+        # Bill would like to add a record and a number of
+        # solos to JMAD. He visits the admin site
+        url = self.live_server_url + '/admin/'
+        self.browser.get(url)
+
+        # He can tell he's in the right place because of the
+        # title of the page
+        self.assertEqual(self.browser.title, 'Log in | Django site admin')
