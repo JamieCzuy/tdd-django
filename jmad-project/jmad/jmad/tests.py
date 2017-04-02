@@ -1,4 +1,6 @@
 from selenium import webdriver
+
+from django.contrib.auth import get_user_model
 from django.test import LiveServerTestCase
 
 from albums.models import Album
@@ -13,6 +15,12 @@ class StudentTestCase(LiveServerTestCase):
         self.browser = webdriver.Chrome()
         # self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(2)
+
+        self.admin_user = get_user_model().objects.create_superuser(
+            username='test_admin',
+            email='test.admin@example.com',
+            password='test_password'
+        )
 
         self.album1 = Album.objects.create(
             name='My Favorite Things',
@@ -88,7 +96,7 @@ class StudentTestCase(LiveServerTestCase):
     def _find_search_results(self):
         return self.browser.find_elements_by_css_selector('.jmad-search-result a')
 
-    def test_student_find_solos(self):
+    def test_01_test_student_find_solos(self):
         """
         Test that a user can search for solos
         """
@@ -176,9 +184,83 @@ class StudentTestCase(LiveServerTestCase):
         """
         # Bill would like to add a record and a number of
         # solos to JMAD. He visits the admin site
-        url = self.live_server_url + '/admin/'
-        self.browser.get(url)
+
+        admin_url = self.live_server_url + '/admin/'
+        self.browser.get(admin_url)
 
         # He can tell he's in the right place because of the
         # title of the page
+
         self.assertEqual(self.browser.title, 'Log in | Django site admin')
+
+        # He enters his username and password and submits the
+        # form to log in
+
+        login_form = self.browser.find_element_by_id('login-form')
+        login_form.find_element_by_name('username').send_keys('test_admin')
+        login_form.find_element_by_name('password').send_keys('test_password')
+        login_form.find_element_by_css_selector('.submit-row input').click()
+
+        # He sees links to Albums
+        albums_link = self.browser.find_element_by_link_text('Albums')
+
+        self.assertEqual(
+            albums_link.get_attribute('href'),
+            self.live_server_url + '/admin/albums/album/'
+        )
+
+        # He sees links to Tracks
+        tracks_link = self.browser.find_element_by_link_text('Tracks')
+        self.assertEqual(
+            tracks_link.get_attribute('href'),
+            self.live_server_url + '/admin/albums/track/'
+        )
+
+        # He sees links to Solos
+        solos_link = self.browser.find_element_by_link_text('Solos')
+        self.assertEqual(
+            solos_link.get_attribute('href'),
+            self.live_server_url + '/admin/solos/solo/'
+        )
+
+        # He clicks on Albums and sees all of the Albums that
+        # have been added so far
+
+        # Going back to the home page, he clicks the Tracks
+        # link and sees the Tracks that have been added.
+        # They're ordered first by Album, then by track
+        # number.
+
+        # He adds a track to an album that already exists
+
+        # He adds another track, this time on an album that
+        # is not in JMAD yet
+
+        # After adding the basic Track info, he clicks on the
+        # plus sign to add a new album.
+
+        # The focus shifts to the newly opened window, where
+        # he sees an Album form
+
+        # After creating the Album, he goes back to finish
+        # the Track
+
+        # He goes back to the root of the admin site and
+        # clicks on 'Solos'
+
+        # He sees Solos listed by Album, then Track, then
+        # start time
+
+        # He adds a Solo to a Track that already exists
+
+        # He then adds a Solo for which the Track and Album
+        # do not yet exist
+
+        # He adds a Track from the Solo page
+
+        # He adds an Album from the Track popup
+
+        # He finishes up both parent objects, and saves the
+        # Solo
+
+        # self.fail('Incomplete Test')

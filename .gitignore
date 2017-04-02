@@ -1,3 +1,6 @@
+# DJango Static Files:
+static/
+
 # DJango Test Database
 db.sqlite3
 
