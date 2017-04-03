@@ -11,16 +11,25 @@ from solos.models import Solo
 
 class StudentTestCase(LiveServerTestCase):
 
+    reset_sequences = True
+
     def setUp(self):
         self.browser = webdriver.Chrome()
         # self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(2)
+        self.browser.set_window_size(1024, 1024)
+        self.browser.set_window_position(0, 0)
 
         self.admin_user = get_user_model().objects.create_superuser(
             username='test_admin',
             email='test.admin@example.com',
             password='test_password'
         )
+
+        from django.db import connection
+        if connection.vendor == 'sqlite':
+            with connection.cursor() as cursor:
+                cursor.execute("UPDATE SQLITE_SEQUENCE SET SEQ= '0' WHERE NAME='albums_album'")
 
         self.album1 = Album.objects.create(
             name='My Favorite Things',
@@ -225,6 +234,23 @@ class StudentTestCase(LiveServerTestCase):
 
         # He clicks on Albums and sees all of the Albums that
         # have been added so far
+
+        albums_link.click()
+
+        self.assertEqual(
+            self.browser.find_element_by_link_text('Know What I Mean?').get_attribute('href'),
+            self.live_server_url + '/admin/albums/album/3/change/'
+        )
+
+        self.assertEqual(
+            self.browser.find_element_by_link_text('Kind of Blue').get_attribute('href'),
+            self.live_server_url + '/admin/albums/album/2/change/'
+        )
+
+        self.assertEqual(
+            self.browser.find_element_by_link_text('My Favorite Things').get_attribute('href'),
+            self.live_server_url + '/admin/albums/album/1/change/'
+        )
 
         # Going back to the home page, he clicks the Tracks
         # link and sees the Tracks that have been added.
