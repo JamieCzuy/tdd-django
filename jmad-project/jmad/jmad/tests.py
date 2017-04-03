@@ -32,6 +32,8 @@ class StudentTestCase(LiveServerTestCase):
         if connection.vendor == 'sqlite':
             with connection.cursor() as cursor:
                 cursor.execute("UPDATE SQLITE_SEQUENCE SET SEQ= '0' WHERE NAME='albums_album'")
+                cursor.execute("UPDATE SQLITE_SEQUENCE SET SEQ= '0' WHERE NAME='albums_track'")
+                cursor.execute("UPDATE SQLITE_SEQUENCE SET SEQ= '0' WHERE NAME='solos_solo'")
 
         self.album1 = Album.objects.create(
             name='My Favorite Things',
@@ -353,19 +355,67 @@ class StudentTestCase(LiveServerTestCase):
             'My Favorite Things John Coltrane'
         )
 
-        # He sees Solos listed by Album, then Track, then
-        # start time
-
         # He adds a Solo to a Track that already exists
 
-        # He then adds a Solo for which the Track and Album
-        # do not yet exist
+        self.browser.find_element_by_link_text('ADD SOLO').click()
+        solo_form = self.browser.find_element_by_id('solo_form')
+
+        solo_form.find_element_by_name('track').find_elements_by_tag_name('option')[7].click()
+        solo_form.find_element_by_name('artist').send_keys('McCoy Tyner')
+        solo_form.find_element_by_name('instrument').send_keys('Piano')
+        solo_form.find_element_by_name('start_time').send_keys('2:19')
+        solo_form.find_element_by_name('end_time').send_keys('7:01')
+        solo_form.find_element_by_name('slug').send_keys('mcoy-tyner')
+
+        solo_form.find_element_by_css_selector('.submit-row input').click()
+
+        self.assertEqual(
+            self.browser.find_elements_by_css_selector('#result_list tr')[5].text,
+            'My Favorite Things McCoy Tyner 2:19-7:01'
+        )
+
+        # He then adds a Solo for which the Track and Album do not yet exist
+
+        self.browser.find_element_by_link_text('ADD SOLO').click()
+        solo_form = self.browser.find_element_by_id('solo_form')
 
         # He adds a Track from the Solo page
 
+        solo_form.find_element_by_id('add_id_track').click()
+        self.browser.switch_to.window(self.browser.window_handles[1])
+
+        track_form = self.browser.find_element_by_id('track_form')
+
+        track_form.find_element_by_name('name').send_keys('In Walked Bud')
+
         # He adds an Album from the Track popup
 
-        # He finishes up both parent objects, and saves the
-        # Solo
+        track_form.find_element_by_id('add_id_album').click()
+        self.browser.switch_to.window(self.browser.window_handles[2])
+        album_form = self.browser.find_element_by_id('album_form')
+        album_form.find_element_by_name('name').send_keys('Misterioso')
+        album_form.find_element_by_name('artist').send_keys('Thelonious Monk Quartet')
+        album_form.find_element_by_name('slug').send_keys('misterioso')
 
-        # self.fail('Incomplete Test')
+        album_form.find_element_by_css_selector('.submit-row input').click()
+
+        # He finishes up both parent objects, and saves the Solo
+        self.browser.switch_to.window(self.browser.window_handles[1])
+        track_form = self.browser.find_element_by_id('track_form')
+        track_form.find_element_by_name('track_number').send_keys('4')
+        track_form.find_element_by_name('slug').send_keys('in-walked-bud')
+        track_form.find_element_by_css_selector('.submit-row input').click()
+
+        self.browser.switch_to.window(self.browser.window_handles[0])
+        solo_form = self.browser.find_element_by_id('solo_form')
+        solo_form.find_element_by_name('artist').send_keys('Johnny Griffin')
+        solo_form.find_element_by_name('instrument').send_keys('Tenor Saxophone')
+        solo_form.find_element_by_name('start_time').send_keys('0:59')
+        solo_form.find_element_by_name('end_time').send_keys('6:21')
+        solo_form.find_element_by_name('slug').send_keys('johnny-griffin')
+        solo_form.find_element_by_css_selector('.submit-row input').click()
+
+        self.assertEqual(
+            self.browser.find_elements_by_css_selector('#result_list tr')[4].text,
+            'In Walked Bud Johnny Griffin 0:59-6:21'
+        )
