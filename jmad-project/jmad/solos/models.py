@@ -18,3 +18,12 @@ class Solo(models.Model):
             'track': self.track.slug,
             'artist': self.slug,
         })
+
+    def get_duration(self):
+        if self.start_time and self.end_time:
+            return '{}-{}'.format(self.start_time, self.end_time)
+        else:
+            return ''
+
+    class Meta:
+        ordering = ['track', 'start_time']
