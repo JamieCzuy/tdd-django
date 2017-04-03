@@ -1,6 +1,7 @@
 from selenium import webdriver
 
 from django.contrib.auth import get_user_model
+from django.contrib.staticfiles.handlers import StaticFilesHandler
 from django.test import LiveServerTestCase
 
 from albums.models import Album
@@ -11,7 +12,8 @@ from solos.models import Solo
 
 class StudentTestCase(LiveServerTestCase):
 
-    reset_sequences = True
+    reset_sequences = True  # Doesn't work for sqlite - see SQL below for sqlite reset)
+    static_handler = StaticFilesHandler
 
     def setUp(self):
         self.browser = webdriver.Chrome()
