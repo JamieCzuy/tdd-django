@@ -79,6 +79,20 @@ class IndexViewTestCase(_SolosBaseTestCase):
         self.assertEqual(len(solos), 1)
         self.assertEqual(solos[0].artist, 'Rich')
 
+    def test_index_view_returns_external_tracks(self):
+        """
+        Test that the index view will return artists from the
+        MusicBrainz API if none are returned from our database
+        """
+
+        response = self.client.get('/', {
+            'instrument': 'Bass',
+            'artist': 'Jaco Pastorius'  # not currently in the DB
+        })
+        solos = response.context['solos']
+        self.assertEqual(len(solos), 1)
+        self.assertEqual(solos[0].artist, 'Jaco Pastorius')
+
 
 class SoloViewTestCase(_SolosBaseTestCase):
 

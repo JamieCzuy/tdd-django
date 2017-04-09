@@ -3,6 +3,9 @@ from django.db import models
 
 from albums.models import Track
 
+import musicbrainzngs as mb
+mb.set_useragent('JMAD - http://jmad.us/', version='0.0.1')
+
 
 class Solo(models.Model):
     track = models.ForeignKey(Track)
@@ -11,6 +14,10 @@ class Solo(models.Model):
     start_time = models.CharField(max_length=20, blank=True, null=True)
     end_time = models.CharField(max_length=20, blank=True, null=True)
     slug = models.SlugField()
+
+    @classmethod
+    def get_artist_tracks_from_musicbrainz(cls, artist):
+        return mb.search_artists(artist)
 
     def get_absolute_url(self):
         return reverse('solo_detail_view', kwargs={
